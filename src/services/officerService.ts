@@ -1,18 +1,15 @@
 import { prisma } from "../client";
 
 
-export const updateEmployee = async (
+export const updateOfficer = async (
   id: number,
-  employeeId: number,
+  managerId: number,
   profilePic: string | null,
   fullName: string,
   email: string,
   phone: string,
   designation: string,
-  department: string,
   dob: string,
-  bloodGroup: string,
-  dateOfJoining: string,
 ) => {
   try{
     const existingUser = await prisma.user.findUnique({
@@ -28,16 +25,12 @@ export const updateEmployee = async (
         id: id
       },
       data: {
-        employeeId,
         ...(profilePic && { profilePic }),
         fullName,
         email,
         phone,
         designation,
-        department,
         dob: new Date(dob),
-        bloodGroup,
-        dateOfJoining: new Date(dateOfJoining),
       },
     });
     
@@ -47,16 +40,16 @@ export const updateEmployee = async (
   }
 };
 
-export const getEmployeeIdByUserId = async (userId: any): Promise<any | null> => {
+export const getOfficerIdByUserId = async (userId: any): Promise<any | null> => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { Employee: { select: { id: true } } },
+      select: { Officer: { select: { id: true } } },
     });
-    return user?.Employee?.id || null;
+    return user?.Officer?.id || null;
   } catch (error) {
     if (error instanceof Error) {
-      console.error('Error fetching Employee Id:', error.message);
+      console.error('Error fetching Officer Id:', error.message);
       return null; 
     } else {
       console.error('An unknown error occurred');

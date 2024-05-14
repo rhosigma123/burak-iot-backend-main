@@ -3,23 +3,27 @@ import { prisma } from '../../client';
 import { Prisma } from '@prisma/client';
 import { getManagerIdByUserId } from '../../services/managerService';
 
-export const viewCreateCalendarEvent = async (req: Request, res: Response) => {
+export const viewCreateDevice = async (req: Request, res: Response) => {
   try {
-    const { date, eventName, description } = req.body;
+    const { content } = req.body;
 
-    const userId = (req as any).user.userId
-    const managerId = await getManagerIdByUserId(userId);
+    // const userId = (req as any).user.userId
+    // const managerId = await getManagerIdByUserId(userId);
 
-    const calendarEvent = await prisma.calendarEvent.create({
-      data: {
-        managerId,
-        date: new Date(date),
-        eventName,
-        description,
-      }
-    })
 
-    res.status(201).json({ message: 'Calendar Event created successfully', calendarEvent });
+    console.log(content)
+
+    // const device = await prisma.device.create({
+    //   data: {
+    //     managerId,
+    //     date: new Date(date),
+    //     eventName,
+    //     description,
+    //   }
+    // })
+    req.app.get('io').emit('content', content);
+
+    res.status(201).json({ message: 'Data Received created successfully' });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -29,23 +33,27 @@ export const viewCreateCalendarEvent = async (req: Request, res: Response) => {
   }
 };
 
-export const viewUpdatedCalendarEvent = async (req: Request, res: Response) => {
+
+
+
+
+export const viewUpdatedDevice = async (req: Request, res: Response) => {
   try {
     const { date, eventName, description } = req.body;
     const { id } = req.params;
     const userId = (req as any).user.userId
     const managerId = await getManagerIdByUserId(userId);
 
-    const calendarEvent = await prisma.calendarEvent.update({
-      where: {id: parseInt(id), managerId: managerId},
-      data: {
-        date: new Date(date),
-        eventName,
-        description,
-      }
-    })
+    // const device = await prisma.device.update({
+    //   where: {id: parseInt(id), managerId: managerId},
+    //   // data: {
+    //   //   date: new Date(date),
+    //   //   eventName,
+    //   //   description,
+    //   // }
+    // })
 
-    res.status(202).json({ message: 'Calendar Event updated successfully', calendarEvent });
+  res.status(202).json({ message: 'Calendar Event updated successfully',});
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -55,13 +63,13 @@ export const viewUpdatedCalendarEvent = async (req: Request, res: Response) => {
   }
 };
 
-export const viewCalendarEvents = async (req: Request, res: Response) => {
+export const viewDevices = async (req: Request, res: Response) => {
   try {
-    const calendarEvents = await prisma.calendarEvent.findMany({
-      orderBy: { date: 'desc' },
+    const devices = await prisma.device.findMany({
+      orderBy: { createdAt: 'desc' },
     });
 
-    res.status(200).json(calendarEvents);
+    res.status(200).json(devices);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -71,19 +79,19 @@ export const viewCalendarEvents = async (req: Request, res: Response) => {
   }
 };
 
-export const viewCalendarEventById = async (req: Request, res: Response) => {
+export const viewDeviceById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const calendarEvent = await prisma.calendarEvent.findUnique({
+    const device = await prisma.device.findUnique({
       where: { id: parseInt(id) },
     });
 
-    if (!calendarEvent) {
+    if (!device) {
       return res.status(404).json({ message: 'Calendar Event not found' });
     }
 
-    res.status(201).json(calendarEvent);
+    res.status(201).json(device);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -93,13 +101,13 @@ export const viewCalendarEventById = async (req: Request, res: Response) => {
   }
 };
 
-export const viewDeleteCalendarEvent = async (req: Request, res: Response) => {
+export const viewDeleteDevice = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.userId
     const managerId = await getManagerIdByUserId(userId);
 
-    await prisma.calendarEvent.delete({
+    await prisma.device.delete({
       where: { id: parseInt(id), managerId: managerId },
     });
 

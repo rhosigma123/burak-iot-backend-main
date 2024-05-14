@@ -73,9 +73,8 @@ model Officer {
 }
 
 model Device {
-  id        String @id @default(uuid())
+  id        Int @id @default(autoincrement())
   managerId Int
-  folderId  String
 
   name       String
   status     DeviceStatus @default(OFFLINE)

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../client';
 import { Prisma } from '@prisma/client';
-import { updateEmployee } from '../../services/employeeService';
+import { updateOfficer } from '../../services/officerService';
 import { getManagerIdByUserId } from '../../services/managerService';
 
-export const viewEmployeeProfile = async (req: Request, res: Response) => {
+export const viewOfficerProfile = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId
     
@@ -23,9 +23,9 @@ export const viewEmployeeProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const viewUpdateEmployee = async (req: Request, res: Response) => {
+export const viewUpdateOfficer = async (req: Request, res: Response) => {
   try {
-    const { employeeId, fullName, email, phone, designation, department,  dob, bloodGroup, dateOfJoining } = req.body;
+    const { fullName, email, phone, designation, dob } = req.body;
     const { id } = req.params
     let profilePic = null;
 
@@ -37,7 +37,7 @@ export const viewUpdateEmployee = async (req: Request, res: Response) => {
     const userId = (req as any).user.userId
     const managerId = await getManagerIdByUserId(userId)
 
-    const user = await updateEmployee( parseInt(id), employeeId, profilePic, fullName, email, phone, designation, department,  dob, bloodGroup, dateOfJoining );
+    const user = await updateOfficer( parseInt(id), managerId, profilePic, fullName, email, phone, designation, dob);
     res.status(201).json({ message: 'Officer registered successfully', user });
   } catch (error) {
     if (error instanceof Error) {
@@ -48,37 +48,33 @@ export const viewUpdateEmployee = async (req: Request, res: Response) => {
   }
 };
 
-export const viewEmployees = async (req: Request, res: Response) => {
+export const viewOfficers = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId
     const managerId = await getManagerIdByUserId(userId);
 
-    const employees = await prisma.employee.findMany({
+    const officers = await prisma.officer.findMany({
       where: { managerId: managerId },
       select: {
         id: true,
         User: {
           select: {
             id: true,
-            employeeId: true,
             profilePic: true,
             fullName: true,
             email: true,
             phone: true,
             designation: true,
-            department: true,
             dob: true,
-            bloodGroup: true,
-            dateOfJoining: true,
           }
         }
       }
     });
-    if (!employees) {
-      return res.status(404).json({ message: 'Employees not found' });
+    if (!officers) {
+      return res.status(404).json({ message: 'Officers not found' });
     }
 
-    res.json(employees);
+    res.json(officers);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -88,38 +84,34 @@ export const viewEmployees = async (req: Request, res: Response) => {
   }
 };
 
-export const viewEmployeeById = async (req: Request, res: Response) => {
+export const viewOfficerById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.userId
     const managerId = await getManagerIdByUserId(userId);
 
-    const employee = await prisma.employee.findUnique({
+    const officer = await prisma.officer.findUnique({
       where: { id: parseInt(id), managerId: managerId },
       select: {
         id: true,
         User: {
           select: {
             id: true,
-            employeeId: true,
             profilePic: true,
             fullName: true,
             email: true,
             phone: true,
             designation: true,
-            department: true,
             dob: true,
-            bloodGroup: true,
-            dateOfJoining: true,
           }
         }
       }
     });
 
-    if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
+    if (!officer) {
+      return res.status(404).json({ message: 'Officer not found' });
     }
-    res.json(employee);
+    res.json(officer);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -129,18 +121,18 @@ export const viewEmployeeById = async (req: Request, res: Response) => {
   }
 };
 
-export const viewDeleteEmployee = async (req: Request, res: Response) => {
+export const viewDeleteOfficer = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    await prisma.employee.delete({
+    await prisma.officer.delete({
       where: { id: parseInt(id) },
     });
 
-    res.json({ message: 'Employee deleted successfully' });
+    res.json({ message: 'Officer deleted successfully' });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-      return res.status(404).json({ message: 'Employees not found' });
+      return res.status(404).json({ message: 'Officer not found' });
     }
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
