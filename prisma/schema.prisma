@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  profilePic    String?
+  fullName      String
+  email         String          @unique
+  phone         String?
+  designation   String
+  dob           DateTime?       @db.Date
+  password      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  roleType      RoleType        @default(USER)
+  Manager       Manager?
+  Officer       Officer?
+  Notifications Notifications[]
+}
+
+enum RoleType {
+  USER
+  MANAGER
+  OFFICER
+}
+
+model Company {
+  id        Int       @id @default(autoincrement())
+  name      String
+  logo      String?
+  email     String
+  phone     String?
+  industry  String
+  address   String
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  Managers  Manager[]
+}
+
+model Manager {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  companyId Int?
+  updatedAt DateTime @updatedAt
+
+  User    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Company Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Officer Officer[]
+  Device  Device[]
+}
+
+model Officer {
+  id        Int @id @default(autoincrement())
+  userId    Int @unique
+  managerId Int
+
+  createdAt DateTime  @default(now())
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  User    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Manager Manager @relation(fields: [managerId], references: [id])
+}
+
+model Device {
+  id        String @id @default(uuid())
+  managerId Int
+  folderId  String
+
+  name       String
+  status     DeviceStatus @default(OFFLINE)
+  isFavorite Boolean      @default(false)
+
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Manager Manager @relation(fields: [managerId], references: [id])
+}
+
+enum DeviceStatus {
+  ONLINE
+  OFFLINE
+}
+
+model Notifications {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  User      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
