@@ -11,12 +11,12 @@ import { CLIENT_URL } from './config';
 import * as mqtt from 'mqtt';
 import { handleMqttMessage } from './api/controllers/managerController';
 
-const createApp = (): Express => {
+const createApp = (): { app: Express, server: http.Server } => {
     const app = express();
     const server = http.createServer(app);
     const io = new Server(server, {
         cors: {
-            origin: "*",
+            origin: CLIENT_URL,
         },
         transports: ["websocket", "polling"],
     });
@@ -69,7 +69,7 @@ const createApp = (): Express => {
     app.use('/api', officerRoutes);
     app.use('/api', deviceRoutes);
 
-    return app;
+    return { app, server };
 };
 
 export default createApp;

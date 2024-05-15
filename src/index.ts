@@ -2,9 +2,9 @@ import { PORT } from './config';
 import createApp from './app';
 import log from './utils/logger';
 
-const app = createApp();
+const { app, server } = createApp();
 const port = PORT || 3000;
 
-app.listen(port, () => {
+server.listen(port, () => {
   log.info(`Server is running on http://localhost:${port}`);
 });
