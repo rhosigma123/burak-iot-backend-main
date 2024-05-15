@@ -65,8 +65,8 @@ export const viewUpdatedDevice = async (req: Request, res: Response) => {
 
 export const viewDevices = async (req: Request, res: Response) => {
   try {
-    const devices = await prisma.device.findMany({
-      orderBy: { createdAt: 'desc' },
+    const devices = await prisma.telemetry.findMany({
+      orderBy: { receivedAt: 'desc' },
     });
 
     res.status(200).json(devices);
@@ -83,7 +83,7 @@ export const viewDeviceById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const device = await prisma.device.findUnique({
+    const device = await prisma.telemetry.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -107,7 +107,7 @@ export const viewDeleteDevice = async (req: Request, res: Response) => {
     const userId = (req as any).user.userId
     const managerId = await getManagerIdByUserId(userId);
 
-    await prisma.device.delete({
+    await prisma.telemetry.delete({
       where: { id: parseInt(id), managerId: managerId },
     });
 

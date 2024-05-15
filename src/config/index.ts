@@ -6,7 +6,7 @@ import { SmtpCredentials } from '../types/smtp';
 export const JWTSECRET = process.env.JWT_SECRET || 'fgsuildtguisdhguihsduasdfiwusdighksdfhgjksdf'
 export const PORT = process.env.PORT || 4000
 export const LOGLEVEL = process.env.LOG_LEVEL || "info"
-export const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000"
+export const CLIENT_URL = process.env.CLIENT_URL || "http://192.168.0.238:3000"
 
 export const SMTP_CRED: SmtpCredentials = {
     user: process.env.SMTP_USER || '',
